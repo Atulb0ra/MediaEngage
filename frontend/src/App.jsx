@@ -1,3 +1,4 @@
+
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom"
 import AuthProvider from "./context/authContext"
 import HomePage from "./pages/HomePage.jsx"
@@ -6,6 +7,7 @@ import SigninPage from "./pages/SigninPage.jsx"
 import DashboardPage from "./pages/DashboardPage.jsx"
 import Navbar from "./components/Navbar.jsx"
 import Footer from "./components/Footer.jsx"
+
 
 function App() {
   return (
@@ -28,6 +30,7 @@ function App() {
                 <Route path="/signup" element={<SignupPage />} />
                 <Route path="/signin" element={<SigninPage />} />
                 <Route path="/dashboard" element={<DashboardPage />} />
+                
               </Routes>
             </main>
             <Footer />
