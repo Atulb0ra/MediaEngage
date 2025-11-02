@@ -26,10 +26,10 @@ const CreatorDashboard = () => {
         setPreviewUrls(prev => prev.filter((_, i) => i !== index));
     }
     return (
-        <div className="p-6 mt-15 max-w-6xl mx-auto">
-            <div className='border p-4 rounded shadow mb-8'>
-                <h1 className='text-xl font-bold mb-2 text-center'>Create Campaign</h1>
-                <div className='flex flex-col gap-2 flex-start '>
+        <div className="px-4 py-8 mt-15 max-w-4xl mx-auto">
+            <div className='border border-white p-4 rounded-xl mb-8 shadow-[0_0_15px_rgba(255,255,255,0.3)] bg-[color-mix(in_oklab,var(--color-black)_30%,transparent)]'>
+                <h1 className='text-2xl font-bold text-center text-gray-200 mb-8'>Create Campaign</h1>
+                <div className='flex flex-col gap-2 flex-start text-gray-400'>
                     <input type="text"
                         placeholder="Campaign Title"
                         value={title}
@@ -94,12 +94,12 @@ const CreatorDashboard = () => {
                     </div>
                 )}
 
-                <button className='mt-4 px-4 py-2 bg-green-600 text-white rounded '>
+                <button className=' px-4 py-2 bg-white text-black  mt-8 rounded '>
                     Create Campaign
                 </button>
             </div>
 
-            <h3 className='text-2xl font-semibold mb-3 text-center'>My Campaigns</h3>
+            <h3 className='text-4xl font-semibold mb-3 text-center text-white mt-20'>My Campaigns</h3>
         </div>
     )
 }
