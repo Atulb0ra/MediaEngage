@@ -4,9 +4,9 @@ import AuthProvider from "./context/authContext"
 import HomePage from "./pages/HomePage.jsx"
 import SignupPage from "./pages/signupPage.jsx"
 import SigninPage from "./pages/SigninPage.jsx"
-import DashboardPage from "./pages/DashboardPage.jsx"
 import Navbar from "./components/Navbar.jsx"
 import Footer from "./components/Footer.jsx"
+import Creator from "./pages/Creator.jsx"
 
 
 function App() {
@@ -29,8 +29,7 @@ function App() {
                 <Route path="/" element={<HomePage />} />
                 <Route path="/signup" element={<SignupPage />} />
                 <Route path="/signin" element={<SigninPage />} />
-                <Route path="/dashboard" element={<DashboardPage />} />
-                
+                <Route path="/creator" element={<Creator />} />
               </Routes>
             </main>
             <Footer />

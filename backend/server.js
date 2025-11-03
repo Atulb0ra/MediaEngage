@@ -3,6 +3,7 @@ import cors from 'cors'
 import connectDB from './config/mongodb.js'
 import 'dotenv/config'
 import connectCloudinary from './config/cloudinary.js'
+import campaignRoutes from './routes/campaignRoutes.js'
 
 const app = express()
 const PORT = process.env.PORT || 5000
@@ -17,6 +18,7 @@ app.get('/', (req, res) => {
     res.send("API WORKING...")
 })
 
+app.use('/api/campaigns', campaignRoutes);
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
 })
