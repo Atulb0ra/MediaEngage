@@ -2,7 +2,7 @@ import mongoose from 'mongoose';
 
 const mediaSchema = new mongoose.Schema({
     url : String,
-    resourceType : String,
+    resource_type : String,
 });
 
 const campaignSchema = new mongoose.Schema({
@@ -11,6 +11,10 @@ const campaignSchema = new mongoose.Schema({
         required: true
     },
     title : {
+        type: String,
+        required: true
+    },
+    description : {
         type: String,
         required: true
     },
@@ -55,3 +59,6 @@ const campaignSchema = new mongoose.Schema({
         default: Date.now
     },
 });
+
+const Campaign = mongoose.model('Campaign', campaignSchema);
+export default Campaign;

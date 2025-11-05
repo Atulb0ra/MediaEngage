@@ -2,7 +2,7 @@ import express from 'express'
 import cors from 'cors'
 import connectDB from './config/mongodb.js'
 import 'dotenv/config'
-import connectCloudinary from './config/cloudinary.js'
+import {connectCloudinary} from './config/cloudinary.js'
 import campaignRoutes from './routes/campaignRoutes.js'
 
 const app = express()
@@ -19,6 +19,7 @@ app.get('/', (req, res) => {
 })
 
 app.use('/api/campaigns', campaignRoutes);
+
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
 })

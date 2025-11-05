@@ -1,14 +1,15 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
+import { useAuth } from '@clerk/clerk-react'
 
 const Creator = () => {
-  const [campaigns, setCampaigns] = useState([]);
+    const { getToken } = useAuth()
     const [title, setTitle] = useState('');
+    const [description, setDescription] = useState('');
     const [type, setType] = useState('image');
     const [mediaFiles, setMediaFiles] = useState([]);
     const [previewUrls, setPreviewUrls] = useState([]);
     const [budget, setBudget] = useState('');
     const [maxParticipants, setMaxParticipants] = useState('');
-
 
     const handleFiles = (e) => {
         const files = Array.from(e.target.files);
@@ -17,13 +18,64 @@ const Creator = () => {
         const newUrls = uniqueFiles.map(file => URL.createObjectURL(file));
         setMediaFiles(prev => [...prev, ...uniqueFiles]);
         setPreviewUrls(prev => [...prev, ...newUrls]);
-
     }
 
     const removeFile = (index) => {
         setMediaFiles(prev => prev.filter((_, i) => i !== index));
         setPreviewUrls(prev => prev.filter((_, i) => i !== index));
     }
+
+    const create = async () => {
+        if (!title || mediaFiles.length === 0 || !budget || !maxParticipants) {
+            alert('Please fill all fields and upload at least one media file.');
+            return;
+        }
+
+        try {
+            const token = await getToken();
+
+            const formData = new FormData();
+            formData.append('title', title);
+            formData.append('description', description);
+            formData.append('totalBudget', budget);
+            formData.append('maxParticipants', maxParticipants);
+
+            mediaFiles.forEach(file => {
+                formData.append('media', file);
+            });
+
+            console.log("JWT Token:", token);
+
+            const res = await fetch(`${import.meta.env.VITE_BACKEND_URL || "http://localhost:5000"}/api/campaigns/create`, {
+                method: 'POST',
+                headers: {
+                    "Authorization": `Bearer ${token}`
+                },
+                body: formData
+            })
+
+            const data = await res.json();
+
+            if (!res.ok) {
+                throw new Error(data.message || 'Failed to create campaign');
+            }
+
+            alert('Campaign created successfully!');
+            console.log('Created:', data);
+
+            setTitle('');
+            setDescription('');
+            setBudget('');
+            setMaxParticipants('');
+            setMediaFiles([]);
+            setPreviewUrls([]);
+        }
+        catch (error) {
+            console.error('Error creating campaign:', error);
+            alert('Failed to create campaign. Please try again.');
+        }
+    }
+
     return (
         <div className="px-4 py-8 mt-15 max-w-4xl mx-auto">
             <div className='border border-white p-4 rounded-xl mb-8 shadow-[0_0_15px_rgba(255,255,255,0.3)] bg-[color-mix(in_oklab,var(--color-black)_30%,transparent)]'>
@@ -33,6 +85,13 @@ const Creator = () => {
                         placeholder="Campaign Title"
                         value={title}
                         onChange={e => setTitle(e.target.value)}
+                        className="rounded border p-2 md:w-auto w-full flex-1"
+                    />
+
+                    <textarea type="text"
+                        placeholder="Campaign Description"
+                        value={description}
+                        onChange={e => setDescription(e.target.value)}
                         className="rounded border p-2 md:w-auto w-full flex-1"
                     />
 
@@ -49,7 +108,7 @@ const Creator = () => {
                         <input
                             type="file"
                             multiple
-                            accept={type === 'image' ? '/image*' : '/video*'}
+                            accept={type === 'image' ? 'image/*' : 'video/*'}
                             onChange={handleFiles}
                             className="rounded border p-2 w-full"
                         />
@@ -93,7 +152,7 @@ const Creator = () => {
                     </div>
                 )}
 
-                <button className=' px-4 py-2 bg-white text-black  mt-8 rounded '>
+                <button onClick={create} className=' px-4 py-2 bg-white text-black  mt-8 rounded '>
                     Create Campaign
                 </button>
             </div>
@@ -101,4 +160,4 @@ const Creator = () => {
     )
 }
 
-export default Creator
+export default Creator;

@@ -1,11 +1,7 @@
-import {Clerk} from '@clerk/clerk-sdk-node';
+import { verifyToken } from '@clerk/backend';
 import dotenv from 'dotenv';
 
 dotenv.config();
-
-const clerk = new Clerk({
-    apiKey : process.env.CLERK_SECRET_KEY,
-});
 
 export const requireAuth = async (req, res, next) => {
     try{
@@ -13,8 +9,17 @@ export const requireAuth = async (req, res, next) => {
         if (!authHeader) {
             return res.status(401).json({ message: 'Unauthorized' });
         }
-        const token = authHeader.replace('Bearer', '');
-        const {userId} = await clerk.sessions.verifyToken(token);
+        const token = authHeader.replace('Bearer ', '').trim();
+         // verify token and be tolerant about claim names (Clerk may return sub or userId)
+         const payload = await verifyToken(token, {
+            secretKey: process.env.CLERK_SECRET_KEY,
+        });
+
+        const userId = payload?.userId || payload?.sub || payload?.uid || payload?.subject;
+        if (!userId) {
+            console.error('verifyToken did not return a user id:', payload);
+            return res.status(401).json({ message: 'Unauthorized' });
+        }
         req.userId = userId;
         next();
     }
