@@ -44,7 +44,7 @@ const Creator = () => {
                 formData.append('media', file);
             });
 
-            console.log("JWT Token:", token);
+            // console.log("JWT Token:", token);
 
             const res = await fetch(`${import.meta.env.VITE_BACKEND_URL || "http://localhost:5000"}/api/campaigns/create`, {
                 method: 'POST',
