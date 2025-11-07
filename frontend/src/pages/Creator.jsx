@@ -10,6 +10,7 @@ const Creator = () => {
     const [previewUrls, setPreviewUrls] = useState([]);
     const [budget, setBudget] = useState('');
     const [maxParticipants, setMaxParticipants] = useState('');
+    const [isCreating, setIsCreating] = useState(false);
 
     const handleFiles = (e) => {
         const files = Array.from(e.target.files);
@@ -32,6 +33,7 @@ const Creator = () => {
         }
 
         try {
+            setIsCreating(true);
             const token = await getToken();
 
             const formData = new FormData();
@@ -73,6 +75,9 @@ const Creator = () => {
         catch (error) {
             console.error('Error creating campaign:', error);
             alert('Failed to create campaign. Please try again.');
+        }
+        finally {
+            setIsCreating(false);
         }
     }
 
@@ -152,8 +157,15 @@ const Creator = () => {
                     </div>
                 )}
 
-                <button onClick={create} className=' px-4 py-2 bg-white text-black  mt-8 rounded '>
-                    Create Campaign
+                <button onClick={create} disabled={isCreating} className={`px-4 py-2 mt-8 rounded transition transform active:scale-95 ${isCreating ? 'bg-gray-400 text-gray-700 cursor-not-allowed' : 'bg-white text-black'}`}>
+                    {isCreating ? (
+                        <span className="inline-flex items-center gap-2">
+                            <svg className="animate-spin h-5 w-5 text-black" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path></svg>
+                            Uploading...
+                        </span>
+                    ) : (
+                        'Create Campaign'
+                    )}
                 </button>
             </div>
         </div>

@@ -2,11 +2,10 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom"
 import AuthProvider from "./context/authContext"
 import HomePage from "./pages/HomePage.jsx"
-import SignupPage from "./pages/signupPage.jsx"
-import SigninPage from "./pages/SigninPage.jsx"
 import Navbar from "./components/Navbar.jsx"
 import Footer from "./components/Footer.jsx"
 import Creator from "./pages/Creator.jsx"
+import MyCampaign from "./pages/MyCampaign.jsx"
 
 
 function App() {
@@ -27,8 +26,7 @@ function App() {
             <main className="grow">
               <Routes>
                 <Route path="/" element={<HomePage />} />
-                <Route path="/signup" element={<SignupPage />} />
-                <Route path="/signin" element={<SigninPage />} />
+                <Route path="/my" element={<MyCampaign />} />
                 <Route path="/creator" element={<Creator />} />
               </Routes>
             </main>

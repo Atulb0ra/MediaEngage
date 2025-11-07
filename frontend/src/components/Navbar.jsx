@@ -11,8 +11,8 @@ const Navbar = () => {
 
         <div className="flex items-center gap-4">
 
-          <Link to="/creator" className="hidden sm:block text-m text-gray-300 hover:text-white">Create</Link>
-          <Link to="/dashboard" className="hidden sm:block text-m text-gray-300 hover:text-white">My Campaigns</Link>
+          <Link to="/creator" className="hidden sm:block text-m text-gray-300 hover:text-white">Create Campaigns</Link>
+          <Link to="/my" className="hidden sm:block text-m text-gray-300 hover:text-white">My Campaigns</Link>
 
           <SignedOut>
             <SignInButton mode="modal">

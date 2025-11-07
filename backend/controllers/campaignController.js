@@ -22,17 +22,24 @@ export const createCampaign = async (req, res) => {
         if(files.length === 0) return res.status(400).json({ message: 'At least one media file is required' }); 
         if(files.length > 5) return res.status(400).json({ message: 'Maximum 5 media files are allowed' });
 
-        const uploaded = [];
-        for(const file of files){
-            const result = await new Promise((resolve, reject) => {
-                cloudinary.uploader.upload(file.path,{resource_type : 'auto'}, (err, res) => {
-                    if(err) reject(err);
-                    else resolve(res);
+        // upload files in parallel to reduce overall upload time (max 5 files)
+        const startUpload = Date.now();
+        const uploadPromises = files.map((file) => {
+            return new Promise((resolve, reject) => {
+                cloudinary.uploader.upload(file.path, { resource_type: 'auto' }, (err, result) => {
+                    // remove temp file regardless of outcome
+                    fs.unlink(file.path, () => {});
+                    if (err) return reject(err);
+                    resolve({ url: result.secure_url, resource_type: result.resource_type });
                 });
             });
-            uploaded.push({url : result.secure_url, resource_type : result.resource_type});
-            fs.unlink(file.path, () => {});
-        }
+        });
+
+        // Await all uploads in parallel. If one fails, it will throw and be caught below.
+        const uploaded = await Promise.all(uploadPromises);
+        // const uploadDuration = Date.now() - startUpload;
+        // console.log(`Uploaded ${uploaded.length} files in ${uploadDuration}ms`);
+
         // compute per-user budget as a Number
         const perUserBudget = Number((totalBudget / maxParticipants).toFixed(2));
 
