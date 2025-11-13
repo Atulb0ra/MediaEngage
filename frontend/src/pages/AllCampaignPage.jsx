@@ -2,7 +2,7 @@ import { useAuth } from '@clerk/clerk-react'
 import { useEffect, useState } from 'react'
 import CampaignCard from '../components/CampaignCard'
 
-const MyCampaign = () => {
+const AllCampaignPage = () => {
     const { getToken } = useAuth()
     const [campaigns, setCampaigns] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
@@ -13,7 +13,7 @@ const MyCampaign = () => {
                 setIsLoading(true);
                 const token = await getToken();
                 const base = import.meta.env?.VITE_BACKEND_URL || "http://localhost:5000";
-                const res = await fetch(`${base}/api/campaigns/my`, {
+                const res = await fetch(`${base}/api/campaigns/`, {
                     headers: {
                         "Authorization": `Bearer ${token}`
                     }
@@ -33,8 +33,9 @@ const MyCampaign = () => {
         })();
     }, []);
 
-    return (
-        <div className="p-8">
+  return (
+
+      <div className="p-8">
             {isLoading ? (
                 <div className="col-span-full flex items-center justify-center p-8 min-h-screen">
                     <div className="text-center">
@@ -47,7 +48,7 @@ const MyCampaign = () => {
             ) : (
                 <>
                     <h1 className="text-2xl md:text-4xl text-white font-bold mb-3 text-center">
-                        My Campaigns
+                        Campaigns
                     </h1>
                     <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
                         {campaigns.map(item => (
@@ -57,7 +58,8 @@ const MyCampaign = () => {
                 </>
             )}
         </div>
-    )
+
+  )
 }
 
-export default MyCampaign
+export default AllCampaignPage

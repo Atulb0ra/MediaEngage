@@ -7,8 +7,8 @@ import Footer from "./components/Footer.jsx"
 import Creator from "./pages/Creator.jsx"
 import MyCampaign from "./pages/MyCampaign.jsx"
 
-
 function App() {
+
   return (
     <AuthProvider>
       <Router>
