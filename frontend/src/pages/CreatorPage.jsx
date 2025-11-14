@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useAuth } from '@clerk/clerk-react'
 
-const Creator = () => {
+const CreatorPage = () => {
     const { getToken } = useAuth()
     const [title, setTitle] = useState('');
     const [description, setDescription] = useState('');
@@ -172,4 +172,4 @@ const Creator = () => {
     )
 }
 
-export default Creator;
+export default CreatorPage;

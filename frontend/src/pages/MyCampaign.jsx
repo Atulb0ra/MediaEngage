@@ -6,6 +6,8 @@ const MyCampaign = () => {
     const { getToken } = useAuth()
     const [campaigns, setCampaigns] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
+    const [activeTab, setActiveTab] = useState('image');
+
 
     useEffect(() => {
         (async () => {
@@ -33,6 +35,12 @@ const MyCampaign = () => {
         })();
     }, []);
 
+    const imageCampaigns = campaigns.filter(c => c.type === 'image');
+    const videoCampaigns = campaigns.filter(c => c.type === 'video');
+
+    const displayedCampaigns = activeTab === 'image' ? imageCampaigns : videoCampaigns;
+
+
     return (
         <div className="p-8">
             {isLoading ? (
@@ -42,17 +50,49 @@ const MyCampaign = () => {
                         <div className="mt-3 text-white">Loading campaigns...</div>
                     </div>
                 </div>
-            )  : campaigns.length === 0 ? (
+            ) : campaigns.length === 0 ? (
                 <div className="text-center text-gray-400 mt-10">No campaigns yet.</div>
             ) : (
                 <>
                     <h1 className="text-2xl md:text-4xl text-white font-bold mb-3 text-center">
                         My Campaigns
                     </h1>
-                    <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                        {campaigns.map(item => (
-                            <CampaignCard key={item._id} campaign={item} />
-                        ))}
+
+                    <div className="flex justify-center mb-8 mt-8">
+                        <button
+                            onClick={() => setActiveTab('image')}
+                            className={`px-6 py-2 rounded-l-lg font-medium transition-all duration-200 
+                ${activeTab === 'image'
+                                    ? 'bg-blue-600 text-white scale-105 shadow-lg'
+                                    : 'bg-gray-700 text-gray-300 hover:bg-gray-600'}`}
+                        >
+                            Thiumbnails
+                        </button>
+                        <button
+                            onClick={() => setActiveTab('video')}
+                            className={`px-14 py-2 rounded-r-lg font-medium transition-all duration-200 
+                ${activeTab === 'video'
+                                    ? 'bg-pink-600 text-white scale-105 shadow-lg'
+                                    : 'bg-gray-700 text-gray-300 hover:bg-gray-600'}`}
+                        >
+                            
+                        
+                        Ads
+                        </button>
+                    </div>
+
+                    <div className="md: w-[90%] lg:w-[80%] mx-auto">
+                        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                        {displayedCampaigns.length > 0 ? (
+                            displayedCampaigns.map(item => (
+                                <CampaignCard key={item._id} campaign={item} />
+                            ))
+                        ) : (
+                            <div className="col-span-full text-center text-gray-400 py-10">
+                                No {activeTab == 'image' ? 'Thumbnails' : 'Ads'} campaigns found.
+                            </div>
+                        )}
+                    </div>
                     </div>
                 </>
             )}

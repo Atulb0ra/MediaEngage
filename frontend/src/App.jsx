@@ -4,8 +4,9 @@ import AuthProvider from "./context/authContext"
 import HomePage from "./pages/HomePage.jsx"
 import Navbar from "./components/Navbar.jsx"
 import Footer from "./components/Footer.jsx"
-import Creator from "./pages/Creator.jsx"
+import Creator from "./pages/CreatorPage.jsx"
 import MyCampaign from "./pages/MyCampaign.jsx"
+import CreatorPage from "./pages/CreatorPage.jsx"
 
 function App() {
 
@@ -21,13 +22,13 @@ function App() {
             }}
           />
 
-          <div className="relative z-10 flex flex-col min-h-screen">
+          <div className="relative z-10 flex flex-col min-h-screen ">
             <Navbar />
             <main className="grow">
               <Routes>
                 <Route path="/" element={<HomePage />} />
                 <Route path="/my" element={<MyCampaign />} />
-                <Route path="/creator" element={<Creator />} />
+                <Route path="/creator" element={<CreatorPage />} />
               </Routes>
             </main>
             <Footer />

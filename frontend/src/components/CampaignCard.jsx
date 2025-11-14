@@ -9,7 +9,7 @@ const CampaignCard = ({ campaign }) => {
   const shouldShowDetails = !mediaSrc || imgLoaded;
 
   return (
-    <div className="bg-[#14131e] border border-[#2a2a3a] rounded-xl p-4 mt-6 hover:scale-[1.02] transition-transform duration-200">
+    <div className="bg-[#14131e] border border-[#2a2a3a] rounded-xl p-4 mt-1 md:mt-2 hover:scale-[1.02] transition-transform duration-200">
       {mediaSrc ? (
         <div className="w-full mb-3">
           {!imgLoaded && (
