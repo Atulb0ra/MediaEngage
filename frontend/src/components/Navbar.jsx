@@ -36,6 +36,7 @@ const Navbar = () => {
           </SignedIn>
         </div>
       </div>
+      <hr className='border-t border-gray-500'/>
     </nav>
   )
 }

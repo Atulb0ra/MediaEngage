@@ -4,6 +4,7 @@ import connectDB from './config/mongodb.js'
 import 'dotenv/config'
 import {connectCloudinary} from './config/cloudinary.js'
 import campaignRoutes from './routes/campaignRoutes.js'
+import userRoutes from './routes/userRoutes.js'
 
 const app = express()
 const PORT = process.env.PORT || 5000
@@ -19,6 +20,7 @@ app.get('/', (req, res) => {
 })
 
 app.use('/api/campaigns', campaignRoutes);
+app.use('/api/users', userRoutes);
 
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);

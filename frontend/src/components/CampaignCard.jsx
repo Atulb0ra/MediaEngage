@@ -3,6 +3,7 @@ import { useState } from 'react'
 
 const CampaignCard = ({ campaign }) => {
   const mediaSrc = campaign.media?.[0]?.url || "";
+  const mediaType = campaign.media?.[0]?.resource_type || campaign.type;
   const [imgLoaded, setImgLoaded] = useState(false);
 
   // If there is no media, treat as loaded so details show immediately
@@ -15,16 +16,27 @@ const CampaignCard = ({ campaign }) => {
           {!imgLoaded && (
             <div className="w-full h-44 bg-gray-700 rounded-md animate-pulse" aria-hidden="true" />
           )}
-          <img
-            src={mediaSrc}
-            alt={campaign.title}
-            className={`w-full object-cover rounded-md ${imgLoaded ? 'block' : 'hidden'}`}
-            onLoad={() => setImgLoaded(true)}
-            onError={() => setImgLoaded(true)}
-          />
+          {mediaType === 'video' ? (
+            <video
+              src={mediaSrc}
+              alt={campaign.title}
+              controls
+              className={`w-full h-44 object-cover rounded-md ${imgLoaded ? 'block' : 'hidden'}`}
+              onLoadedMetadata={() => setImgLoaded(true)}
+              onError={() => setImgLoaded(true)}
+            />
+          ) : (
+            <img
+              src={mediaSrc}
+              alt={campaign.title}
+              className={`w-full h-44 object-cover rounded-md ${imgLoaded ? 'block' : 'hidden'}`}
+              onLoad={() => setImgLoaded(true)}
+              onError={() => setImgLoaded(true)}
+            />
+          )}
         </div>
       ) : (
-        <div className="w-full h-44 bg-gray-800 rounded-md mb-3 flex items-center justify-center text-gray-400">No image</div>
+        <div className="w-full h-44 bg-gray-800 rounded-md mb-3 flex items-center justify-center text-gray-400">No media</div>
       )}
 
       {shouldShowDetails && (

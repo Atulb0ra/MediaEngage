@@ -6,7 +6,7 @@ import Navbar from "./components/Navbar.jsx"
 import Footer from "./components/Footer.jsx"
 import Creator from "./pages/CreatorPage.jsx"
 import MyCampaign from "./pages/MyCampaign.jsx"
-import CreatorPage from "./pages/CreatorPage.jsx"
+import CampaignDetailsPage from "./pages/CampaignDetailsPage.jsx"
 
 function App() {
 
@@ -28,7 +28,8 @@ function App() {
               <Routes>
                 <Route path="/" element={<HomePage />} />
                 <Route path="/my" element={<MyCampaign />} />
-                <Route path="/creator" element={<CreatorPage />} />
+                <Route path="/creator" element={<Creator />} />
+                <Route path="/campaign/:id" element={<CampaignDetailsPage />} />
               </Routes>
             </main>
             <Footer />
