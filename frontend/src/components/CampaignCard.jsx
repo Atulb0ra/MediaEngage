@@ -9,19 +9,30 @@ const CampaignCard = ({ campaign }) => {
   // If there is no media, treat as loaded so details show immediately
   const shouldShowDetails = !mediaSrc || imgLoaded;
 
+  const getThumbnail = (url) => {
+    try {
+      if (!url.includes("/upload/")) return null;
+
+      return url.replace("/upload/", "/upload/so_1/").replace(".mp4", ".jpg");
+    } catch {
+      return null;
+    }
+  };
+
   return (
     <div className="bg-[#14131e] border border-[#2a2a3a] rounded-xl p-4 mt-1 md:mt-2 hover:scale-[1.02] transition-transform duration-200">
       {mediaSrc ? (
         <div className="w-full mb-3">
-          {!imgLoaded && (
+          {!imgLoaded && mediaType !== 'video' && (
             <div className="w-full h-44 bg-gray-700 rounded-md animate-pulse" aria-hidden="true" />
           )}
           {mediaType === 'video' ? (
             <video
               src={mediaSrc}
-              alt={campaign.title}
               controls
-              className={`w-full h-44 object-cover rounded-md ${imgLoaded ? 'block' : 'hidden'}`}
+              className="w-full h-44 object-cover rounded-md"
+              poster={getThumbnail(mediaSrc)}
+              preload="metadata"
               onLoadedMetadata={() => setImgLoaded(true)}
               onError={() => setImgLoaded(true)}
             />
