@@ -1,19 +1,52 @@
-
 import { useState, useEffect } from "react"
 import { useParams } from "react-router-dom"
 import { ChevronLeft, ChevronRight, ThumbsUp } from "lucide-react"
-import { UserCircleIcon, ChatBubbleLeftRightIcon } from "@heroicons/react/24/solid";
+import { UserCircleIcon } from "@heroicons/react/24/solid";
 
-const CampaignDetailsPage = () => {
+
+const CampaignDetails = () => {
     const { id } = useParams()
     const [campaign, setCampaign] = useState([]);
     const [loading, setLoading] = useState(true);
     const [index, setIndex] = useState(0);
     const [creatorName, setCreatorName] = useState('');
     const [activeTab, setActiveTab] = useState("details");
+    const [selectedIndex, setSelectedIndex] = useState(null);
+    const [pollCounts, setPollCounts] = useState([]);
 
     const media = campaign.media || [];
     const mediaType = campaign.media?.[0]?.resource_type || campaign.type;
+
+    const formatCount = (num) => {
+        if (num >= 1000) return (num / 1000).toFixed(1) + "K";
+        return num;
+    }
+
+    const handleVote = (i) => {
+        // Ensure pollCounts is initialized
+        if (!pollCounts || pollCounts.length === 0) {
+            setPollCounts(new Array(media.length).fill(0));
+        }
+
+        setPollCounts(prev => {
+            const updated = [...prev];
+            const prevSelected = selectedIndex;
+
+            if (prevSelected === i) {
+                updated[i] = Math.max(0, (updated[i] || 0) - 1);
+                setSelectedIndex(null);
+                return updated;
+            }
+
+            if (prevSelected !== null && typeof updated[prevSelected] !== 'undefined') {
+                updated[prevSelected] = Math.max(0, (updated[prevSelected] || 0) - 1);
+            }
+
+            updated[i] = (updated[i] || 0) + 1;
+            setSelectedIndex(i);
+            return updated;
+        })
+    }
 
     useEffect(() => {
         (async () => {
@@ -21,6 +54,7 @@ const CampaignDetailsPage = () => {
                 const res = await fetch(`${import.meta.env.VITE_BACKEND_URL || "http://localhost:5000"}/api/campaigns/${id}`);
                 const data = await res.json();
                 setCampaign(data);
+
 
                 // console.log(data.creatorId)
                 if (data.creatorId) {
@@ -74,12 +108,10 @@ const CampaignDetailsPage = () => {
     };
 
 
-
-
     if (!loading) {
         return (
             <div className='w-full flex justify-center mt-4'>
-                <div className='w-[85%] max-w-[1200px] grid grid-cols-2 gap-10 text-white'>
+                <div className='w-[85%] max-w-[1200px] grid grid-cols-1 md:grid-cols-2 gap-10 text-white'>
                     <div className='h-[calc(100vh-100px)]'>
                         <h1 className='text-4xl font-bold mb-3'>{campaign.title}</h1>
 
@@ -95,10 +127,6 @@ const CampaignDetailsPage = () => {
                                 </div>
                             </div>
 
-                            <button >
-                                <ThumbsUp size={18} />
-                                <span>votes</span>
-                            </button>
                         </div>
 
                         {media.length > 0 && (
@@ -156,7 +184,7 @@ const CampaignDetailsPage = () => {
                             <button onClick={() => setActiveTab("chats")}
                                 className={`text-2xl font-semibold mt-2 ${activeTab === "chats" ? "text-white border-b-2 border-blue-500" : "text-gray-400 hover:text-gray-200"}`}>Chats</button>
                         </div>
-                        <hr className='border-t border-gray-500 mt-4' />
+                        <hr className='border-t border-gray-500 mt-2 mb-6' />
 
                         {activeTab === "details" && (
                             <>
@@ -166,12 +194,35 @@ const CampaignDetailsPage = () => {
                                     <p><strong>Max participants:</strong> {campaign.maxParticipants}</p>
                                     <p><strong>Status:</strong> {campaign.status}</p>
                                 </div>
+
+
+                                <hr className='border-t border-gray-500 mt-6' />
+                        <h2 className="text-2xl fonnt-semibold mt-4">
+                            {mediaType === "video" ? "Select Best Ad" : "Select Best Thumbnail"}
+                        </h2>
+
+                                <div className="flex flex-col mt-4 gap-3">
+                            {media.map((m, i) => (
+                                <div key={i}
+                                    onClick={() => handleVote(i)}
+                                    className="flex items-center justify-between border border-gray-600 rounded-lg p-3 cursor-pointer hover:border-blue-500 transition"
+                                >
+                                    <div className="text-lg font-semibold text-gray-200">
+                                        {mediaType === 'video' ? `Ad ${i + 1}` : `Thumbnail ${i + 1}`}
+                                    </div>
+                                    <div >
+                                        Votes: {formatCount(pollCounts[i] || 0)}
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
                             </>
                         )}
 
                         {activeTab === "chats" && (
                             <>None</>
                         )}
+
                     </div>
                 </div>
             </div>
@@ -179,4 +230,4 @@ const CampaignDetailsPage = () => {
     }
 }
 
-export default CampaignDetailsPage
+export default CampaignDetails

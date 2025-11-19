@@ -1,12 +1,12 @@
-
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom"
 import AuthProvider from "./context/authContext"
 import HomePage from "./pages/HomePage.jsx"
 import Navbar from "./components/Navbar.jsx"
 import Footer from "./components/Footer.jsx"
 import Creator from "./pages/CreatorPage.jsx"
-import MyCampaign from "./pages/MyCampaign.jsx"
-import CampaignDetailsPage from "./pages/CampaignDetailsPage.jsx"
+import MyCampaignPage from "./pages/MyCampaignPage.jsx"
+import CampaignDetails from "./components/CampaignDetails.jsx"
+import AboutPage from "./pages/AboutPage.jsx"
 
 function App() {
 
@@ -27,9 +27,10 @@ function App() {
             <main className="grow">
               <Routes>
                 <Route path="/" element={<HomePage />} />
-                <Route path="/my" element={<MyCampaign />} />
+                <Route path="/my" element={<MyCampaignPage />} />
                 <Route path="/creator" element={<Creator />} />
-                <Route path="/campaign/:id" element={<CampaignDetailsPage />} />
+                <Route path="/campaign/:id" element={<CampaignDetails />} />
+                <Route path="/about" element={<AboutPage />}/>
               </Routes>
             </main>
             <Footer />

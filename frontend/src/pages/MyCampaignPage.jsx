@@ -2,11 +2,12 @@ import { useAuth } from '@clerk/clerk-react'
 import { useEffect, useState } from 'react'
 import CampaignCard from '../components/CampaignCard'
 
-const AllCampaignPage = () => {
+const MyCampaignPage = () => {
     const { getToken } = useAuth()
     const [campaigns, setCampaigns] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const [activeTab, setActiveTab] = useState('image');
+
 
     useEffect(() => {
         (async () => {
@@ -14,7 +15,7 @@ const AllCampaignPage = () => {
                 setIsLoading(true);
                 const token = await getToken();
                 const base = import.meta.env?.VITE_BACKEND_URL || "http://localhost:5000";
-                const res = await fetch(`${base}/api/campaigns/`, {
+                const res = await fetch(`${base}/api/campaigns/my`, {
                     headers: {
                         "Authorization": `Bearer ${token}`
                     }
@@ -40,9 +41,8 @@ const AllCampaignPage = () => {
     const displayedCampaigns = activeTab === 'image' ? imageCampaigns : videoCampaigns;
 
 
-  return (
-
-      <div className="p-8">
+    return (
+        <div className="p-8">
             {isLoading ? (
                 <div className="col-span-full flex items-center justify-center p-8 min-h-screen">
                     <div className="text-center">
@@ -55,7 +55,7 @@ const AllCampaignPage = () => {
             ) : (
                 <>
                     <h1 className="text-2xl md:text-4xl text-white font-bold mb-3 text-center">
-                        Campaigns
+                        My Campaigns
                     </h1>
 
                     <div className="flex justify-center mb-8 mt-8">
@@ -66,7 +66,7 @@ const AllCampaignPage = () => {
                                     ? 'bg-blue-600 text-white scale-105 shadow-lg'
                                     : 'bg-gray-700 text-gray-300 hover:bg-gray-600'}`}
                         >
-                            Thumbnails 
+                            Thiumbnails
                         </button>
                         <button
                             onClick={() => setActiveTab('video')}
@@ -75,7 +75,9 @@ const AllCampaignPage = () => {
                                     ? 'bg-pink-600 text-white scale-105 shadow-lg'
                                     : 'bg-gray-700 text-gray-300 hover:bg-gray-600'}`}
                         >
-                            Ads
+                            
+                        
+                        Ads
                         </button>
                     </div>
 
@@ -95,8 +97,7 @@ const AllCampaignPage = () => {
                 </>
             )}
         </div>
-
-  )
+    )
 }
 
-export default AllCampaignPage
+export default MyCampaignPage

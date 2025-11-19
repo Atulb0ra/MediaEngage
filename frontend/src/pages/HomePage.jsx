@@ -1,8 +1,8 @@
 import { Link } from 'react-router-dom'
 import { useUser } from "@clerk/clerk-react"
-import AllCampaignPage from './AllCampaignPage'
 import robot from '../assets/robot.png'
 import Hero from '../components/Hero'
+import AllCampaign from '../components/AllCampaign'
 
 
 const HomePage = () => {
@@ -20,7 +20,7 @@ const HomePage = () => {
       {isSignedIn && <Hero />}
 
       {isSignedIn ? (
-        <AllCampaignPage />
+        <AllCampaign />
       ) : (
           <div className='min-h-screen flex flex-col justify-center items-center'>
             <h1 className='text-4xl md:text-6xl text-white font-bold mb-4'>Media Engage</h1>

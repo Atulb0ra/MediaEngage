@@ -6,7 +6,7 @@ console.log('Hero component loaded, robot asset ->', robot);
 const Hero = () => {
   return (
     <div>
-      <section className="flex flex-col md:flex-row items-center justify-between gap-10 bg-gradient-to-r from-[#0f172a] to-[#1e293b] rounded-2xl shadow-lg p-8 mt-10 mb-8 py-10 max-w-6xl mx-auto">
+      <section className="flex flex-col md:flex-row items-center justify-between gap-10 bg-linear-to-r from-[#0f172a] to-[#1e293b] rounded-2xl shadow-lg p-8 mt-10 mb-8 py-10 max-w-6xl mx-auto">
             
             {/* Left side - image */}
             <div className="md:w-1/2 flex justify-center">
