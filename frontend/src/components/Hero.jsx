@@ -33,7 +33,7 @@ const Hero = () => {
                   Create Campaign
                 </Link>
                 <Link
-                  to="/learn-more"
+                  to="/about"
                   className="px-6 py-3 border border-gray-400 rounded-xl font-semibold text-gray-300 hover:bg-gray-700 transition"
                 >
                   Learn More

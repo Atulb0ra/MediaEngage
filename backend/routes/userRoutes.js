@@ -5,6 +5,6 @@ import {requireAuth} from '../middleware/clerkAuth.js';
 
 const router = express.Router();
 
-router.get('/:userId', getUserById);
+router.get('/:userId', requireAuth, getUserById);
 
 export default router;

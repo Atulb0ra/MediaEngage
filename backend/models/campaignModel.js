@@ -56,8 +56,18 @@ const campaignSchema = new mongoose.Schema({
     },
     createdAt: {
         type: Date,
-        default: Date.now
+        default: Date.now()
     },
+    pollCounts : {
+        type : [Number],
+        default : []
+    },
+    votes :[
+        {
+            userId : String,
+            index : Number
+        }
+    ]
 });
 
 const Campaign = mongoose.model('Campaign', campaignSchema);

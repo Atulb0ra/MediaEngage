@@ -1,11 +1,13 @@
 import { useState, useEffect } from "react"
+import { useUser, useAuth } from "@clerk/clerk-react";
 import { useParams } from "react-router-dom"
 import { ChevronLeft, ChevronRight, ThumbsUp } from "lucide-react"
 import { UserCircleIcon } from "@heroicons/react/24/solid";
 
 
 const CampaignDetails = () => {
-    const { id } = useParams()
+    const { id } = useParams();
+    const { user } = useUser();
     const [campaign, setCampaign] = useState([]);
     const [loading, setLoading] = useState(true);
     const [index, setIndex] = useState(0);
@@ -13,6 +15,7 @@ const CampaignDetails = () => {
     const [activeTab, setActiveTab] = useState("details");
     const [selectedIndex, setSelectedIndex] = useState(null);
     const [pollCounts, setPollCounts] = useState([]);
+    const { getToken } = useAuth();
 
     const media = campaign.media || [];
     const mediaType = campaign.media?.[0]?.resource_type || campaign.type;
@@ -22,44 +25,44 @@ const CampaignDetails = () => {
         return num;
     }
 
-    const handleVote = (i) => {
-        // Ensure pollCounts is initialized
-        if (!pollCounts || pollCounts.length === 0) {
-            setPollCounts(new Array(media.length).fill(0));
+    useEffect(() => {
+        if (user) {
+            localStorage.setItem("userId", user.id);
         }
+    }, [user]);
 
-        setPollCounts(prev => {
-            const updated = [...prev];
-            const prevSelected = selectedIndex;
-
-            if (prevSelected === i) {
-                updated[i] = Math.max(0, (updated[i] || 0) - 1);
-                setSelectedIndex(null);
-                return updated;
-            }
-
-            if (prevSelected !== null && typeof updated[prevSelected] !== 'undefined') {
-                updated[prevSelected] = Math.max(0, (updated[prevSelected] || 0) - 1);
-            }
-
-            updated[i] = (updated[i] || 0) + 1;
-            setSelectedIndex(i);
-            return updated;
-        })
-    }
 
     useEffect(() => {
         (async () => {
+            const token = await getToken()
             try {
                 const res = await fetch(`${import.meta.env.VITE_BACKEND_URL || "http://localhost:5000"}/api/campaigns/${id}`);
                 const data = await res.json();
                 setCampaign(data);
 
+                if (Array.isArray(data?.media)) {
+                    setPollCounts(data.pollCounts && Array.isArray(data.pollCounts) ? data.pollCounts : new Array(data.media.length).fill(0))
+                }
+                else {
+                    setPollCounts([]);
+                }
+
+                const storedUserId = localStorage.getItem("userId");
+                if (Array.isArray(data?.votes) && storedUserId) {
+                    const voteRecord = data.votes.find((v) => v.userId === storedUserId);
+                    if (voteRecord && typeof voteRecord.index === "number") {
+                        setSelectedIndex(voteRecord.index);
+                    }
+                }
 
                 // console.log(data.creatorId)
                 if (data.creatorId) {
                     try {
-                        const creatorRes = await fetch(`${import.meta.env.VITE_BACKEND_URL || "http://localhost:5000"}/api/users/${data.creatorId}`);
+                        const creatorRes = await fetch(`${import.meta.env.VITE_BACKEND_URL || "http://localhost:5000"}/api/users/${data.creatorId}`, {
+                            headers: {
+                                "Authorization": `Bearer ${token}`
+                            }
+                        });
                         if (creatorRes.ok) {
                             const creatorData = await creatorRes.json();
                             // console.log("Creator data:", creatorData);
@@ -77,6 +80,46 @@ const CampaignDetails = () => {
             setLoading(false);
         })();
     }, [id]);
+
+
+    // for vote counting
+    const handleVote = async (i) => {
+        const token = await getToken();
+
+        const userId = localStorage.getItem("userId");
+        if (!userId) {
+            alert("Login required to vote");
+            return;
+        }
+        try {
+            const res = await fetch(`${import.meta.env.VITE_BACKEND_URL || "http://localhost:5000"}/api/campaigns/${id}/vote`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}` },
+                body: JSON.stringify({ userId, index: i })
+            });
+
+            const data = await res.json();
+
+            if (!Array.isArray(pollCounts) || pollCounts.length < media.length) {
+                setPollCounts((prev) => {
+                    const base = Array.isArray(prev) ? [...prev] : [];
+                    while (base.length < media.length) base.push(0);
+                    return base;
+                });
+            }
+
+            if (data?.success && Array.isArray(pollCounts)) {
+                setPollCounts(data.pollCounts);
+                setSelectedIndex(i);
+            }
+            else {
+                console.error("Vote error :", data);
+            }
+        }
+        catch (error) {
+            console.error("Vote error :", error);
+        }
+    }
 
     if (loading) {
         return <div className="col-span-full flex items-center justify-center p-8 min-h-screen">
@@ -181,8 +224,8 @@ const CampaignDetails = () => {
                         <div className='flex gap-3'>
                             <button onClick={() => setActiveTab("details")}
                                 className={`text-2xl font-semibold mt-2 ${activeTab === "details" ? "text-white border-b-2 border-blue-500" : "text-gray-400 hover:text-gray-200"}`}>Description</button>
-                            <button onClick={() => setActiveTab("chats")}
-                                className={`text-2xl font-semibold mt-2 ${activeTab === "chats" ? "text-white border-b-2 border-blue-500" : "text-gray-400 hover:text-gray-200"}`}>Chats</button>
+                            <button onClick={() => setActiveTab("reviews")}
+                                className={`text-2xl font-semibold mt-2 ${activeTab === "reviews" ? "text-white border-b-2 border-blue-500" : "text-gray-400 hover:text-gray-200"}`}>Reviews</button>
                         </div>
                         <hr className='border-t border-gray-500 mt-2 mb-6' />
 
@@ -197,29 +240,32 @@ const CampaignDetails = () => {
 
 
                                 <hr className='border-t border-gray-500 mt-6' />
-                        <h2 className="text-2xl fonnt-semibold mt-4">
-                            {mediaType === "video" ? "Select Best Ad" : "Select Best Thumbnail"}
-                        </h2>
+                                <h2 className="text-2xl fonnt-semibold mt-4">
+                                    {mediaType === "video" ? "Select Best Ad" : "Select Best Thumbnail"}
+                                </h2>
 
                                 <div className="flex flex-col mt-4 gap-3">
-                            {media.map((m, i) => (
-                                <div key={i}
-                                    onClick={() => handleVote(i)}
-                                    className="flex items-center justify-between border border-gray-600 rounded-lg p-3 cursor-pointer hover:border-blue-500 transition"
-                                >
-                                    <div className="text-lg font-semibold text-gray-200">
-                                        {mediaType === 'video' ? `Ad ${i + 1}` : `Thumbnail ${i + 1}`}
-                                    </div>
-                                    <div >
-                                        Votes: {formatCount(pollCounts[i] || 0)}
-                                    </div>
+                                    {media.map((m, i) => (
+                                        <div key={i}
+                                            onClick={() => handleVote(i)}
+                                            role="button"
+                                            tabIndex={0}
+                                            onKeyDown={(e) => e.key === "Enter" && handleVote(i)}
+                                            className="flex items-center justify-between border border-gray-600 rounded-lg p-3 cursor-pointer hover:border-blue-500 transition"
+                                        >
+                                            <div className="text-lg font-semibold text-gray-200">
+                                                {mediaType === 'video' ? `Ad ${i + 1}` : `Thumbnail ${i + 1}`}
+                                            </div>
+                                            <div >
+                                                Votes: {formatCount(pollCounts[i] || 0)}
+                                            </div>
+                                        </div>
+                                    ))}
                                 </div>
-                            ))}
-                        </div>
                             </>
                         )}
 
-                        {activeTab === "chats" && (
+                        {activeTab === "reviews" && (
                             <>None</>
                         )}
 
