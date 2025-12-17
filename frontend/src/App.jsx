@@ -7,20 +7,17 @@ import Creator from "./pages/CreatorPage.jsx"
 import MyCampaignPage from "./pages/MyCampaignPage.jsx"
 import CampaignDetails from "./components/CampaignDetails.jsx"
 import AboutPage from "./pages/AboutPage.jsx"
+import Pricing from "./components/Pricing.jsx"
+import VerifyPage from "./pages/VerifyPage.jsx"
+
 
 function App() {
 
   return (
     <AuthProvider>
       <Router>
-        <div className="min-h-screen w-full bg-black relative">
+        <div className="min-h-screen w-full relative">
           {/* Cosmic Noise */}
-          <div
-            className="absolute inset-0 z-0"
-            style={{
-              background: "radial-gradient(circle at 20% 20%, rgba(255,255,255,0.08) 0%, transparent 40%), radial-gradient(circle at 80% 30%, rgba(255,255,255,0.05) 0%, transparent 40%), linear-gradient(120deg, #0f0e17 0%, #1a1b26 100%)"
-            }}
-          />
 
           <div className="relative z-10 flex flex-col min-h-screen ">
             <Navbar />
@@ -31,6 +28,8 @@ function App() {
                 <Route path="/creator" element={<Creator />} />
                 <Route path="/campaign/:id" element={<CampaignDetails />} />
                 <Route path="/about" element={<AboutPage />}/>
+                <Route path='pricing' element ={<Pricing />}/>
+                <Route path="/verify" element={<VerifyPage />} />
               </Routes>
             </main>
             <Footer />

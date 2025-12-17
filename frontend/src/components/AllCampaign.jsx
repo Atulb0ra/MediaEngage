@@ -1,12 +1,14 @@
 import { useAuth } from '@clerk/clerk-react'
 import { useEffect, useState } from 'react'
 import CampaignCard from './CampaignCard'
+import { ChevronDownIcon } from 'lucide-react'
 
 const AllCampaign = () => {
     const { getToken } = useAuth()
     const [campaigns, setCampaigns] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const [activeTab, setActiveTab] = useState('image');
+    const [open, setOpen] = useState(false);
 
     useEffect(() => {
         (async () => {
@@ -42,7 +44,7 @@ const AllCampaign = () => {
 
     return (
 
-        <div className="p-8">
+        <div className="p-4">
             {isLoading ? (
                 <div className="col-span-full flex items-center justify-center p-8 min-h-screen">
                     <div className="text-center">
@@ -54,39 +56,34 @@ const AllCampaign = () => {
                 <div className="text-center text-gray-400 mt-10">No campaigns yet.</div>
             ) : (
                 <>
-                    <h1 className="text-2xl md:text-4xl text-white font-bold mb-3 text-center">
-                        Campaigns
-                    </h1>
 
-                    <div className="flex justify-center mb-8 mt-8">
-                        <button
-                            onClick={() => setActiveTab('image')}
-                            className={`px-6 py-2 rounded-l-lg font-medium transition-all duration-200 
-                ${activeTab === 'image'
-                                    ? 'bg-blue-600 text-white scale-105 shadow-lg'
-                                    : 'bg-gray-700 text-gray-300 hover:bg-gray-600'}`}
+                    <div className="flex justify-between mt-1">
+                        <h1 className='text-2xl font-semibold'>Recently added</h1>
+                       <div className='relative'>
+                       <button onClick={() => setOpen(!open)}
+                        className='flex w-[128px] items-center border border-gray-300 rounded-lg justify-between px-4 py-2'
                         >
-                            Thumbnails
+                            <span className='text-black font-semibold text-md'>{activeTab}</span>
+                            <ChevronDownIcon className='h-5 w-5 text-gray-800'/>
                         </button>
-                        <button
-                            onClick={() => setActiveTab('video')}
-                            className={`px-14 py-2 rounded-r-lg font-medium transition-all duration-200 
-                ${activeTab === 'video'
-                                    ? 'bg-pink-600 text-white scale-105 shadow-lg'
-                                    : 'bg-gray-700 text-gray-300 hover:bg-gray-600'}`}
-                        >
-                            Ads
-                        </button>
+                        {open && (
+                            <div className='absolute w-full border border-gray-200 rounded-lg shadow-md z-10'>
+                                <p onClick = {() => setActiveTab('image')} className="px-4 py-2 hover:bg-gray-100 cursor-pointer">YouTube Thumbnail</p>
+                                <p onClick = {() => setActiveTab('video')} className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Video Ads</p>
+                            </div>
+                        )}
+                       </div>
+                        
                     </div>
 
-                    <div className="md: w-[90%] lg:w-[80%] mx-auto">
-                        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <div className="w-full">
+                        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
                             {displayedCampaigns.length > 0 ? (
                                 displayedCampaigns.map(item => (
                                     <CampaignCard key={item._id} campaign={item} />
                                 ))
                             ) : (
-                                <div className="col-span-full text-center text-gray-400 py-10">
+                                <div className="col-span-full text-center text-gray-400">
                                     No {activeTab == 'image' ? 'Thumbnails' : 'Ads'} campaigns found.
                                 </div>
                             )}

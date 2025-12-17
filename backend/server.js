@@ -5,6 +5,7 @@ import 'dotenv/config'
 import {connectCloudinary} from './config/cloudinary.js'
 import campaignRoutes from './routes/campaignRoutes.js'
 import userRoutes from './routes/userRoutes.js'
+import subscriptionRoutes from './routes/subscriptionRoutes.js'
 
 const app = express()
 const PORT = process.env.PORT || 5000
@@ -19,6 +20,8 @@ app.get('/', (req, res) => {
     res.send("API WORKING...")
 })
 
+app.use('/api/subscription', subscriptionRoutes);
+// app.use("api/payment", paymentRoutes);
 app.use('/api/campaigns', campaignRoutes);
 app.use('/api/users', userRoutes);
 

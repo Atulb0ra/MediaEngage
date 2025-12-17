@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useAuth } from '@clerk/clerk-react'
+import { Upload } from 'lucide-react'
 
 const CreatorPage = () => {
     const { getToken } = useAuth()
@@ -8,8 +9,6 @@ const CreatorPage = () => {
     const [type, setType] = useState('image');
     const [mediaFiles, setMediaFiles] = useState([]);
     const [previewUrls, setPreviewUrls] = useState([]);
-    const [budget, setBudget] = useState('');
-    const [maxParticipants, setMaxParticipants] = useState('');
     const [isCreating, setIsCreating] = useState(false);
 
     const handleFiles = (e) => {
@@ -39,8 +38,6 @@ const CreatorPage = () => {
             const formData = new FormData();
             formData.append('title', title);
             formData.append('description', description);
-            formData.append('totalBudget', budget);
-            formData.append('maxParticipants', maxParticipants);
 
             mediaFiles.forEach(file => {
                 formData.append('media', file);
@@ -67,8 +64,6 @@ const CreatorPage = () => {
 
             setTitle('');
             setDescription('');
-            setBudget('');
-            setMaxParticipants('');
             setMediaFiles([]);
             setPreviewUrls([]);
         }
@@ -82,60 +77,40 @@ const CreatorPage = () => {
     }
 
     return (
-        <div className="px-4 py-8 mt-15 max-w-4xl mx-auto">
-            <div className='border border-white p-4 rounded-xl mb-8 shadow-[0_0_15px_rgba(255,255,255,0.3)] bg-[color-mix(in_oklab,var(--color-black)_30%,transparent)]'>
-                <h1 className='text-2xl font-bold text-center text-gray-200 mb-8'>Create Campaign</h1>
-                <div className='flex flex-col gap-2 flex-start text-gray-400'>
-                    <input type="text"
-                        placeholder="Campaign Title"
-                        value={title}
-                        onChange={e => setTitle(e.target.value)}
-                        className="rounded border p-2 md:w-auto w-full flex-1"
-                    />
+        <div className="px-4 mt-8 max-w-4xl mx-auto">
+            <div className='border border-white p-4 mb-8'>
+                <div className='flex flex-col mb-10 items-center'>
+                    <h1 className='text-5xl font-bold text-center text-black'>Free <span className='text-green-800'> YouTube Thumbnail</span> And <span className='text-green-800'>Advertisment</span>  Tester</h1>
+                    <p className='text-black text-2xl mt-2'>Preview & Compare Your Thumbnails And Advertisments</p>
+                    <p className='text-black text-xl mt-5'>The Ultimate Thumbnail & Advertisment Preview Tool to Test Your Thumbnails</p>
+                    <p className='text-black text-xl'>and Advertisment and Optimize Click-Through Rates</p>
+                </div>
+                <div className='flex flex-col gap-2 flex-start text-gray-400 rounded-4xl'>
+
+                    <div className='flex gap-2'>
+                        <input type="w-2/3 text"
+                            placeholder="Campaign Title"
+                            value={title}
+                            onChange={e => setTitle(e.target.value)}
+                            className="rounded-xl border p-2 md:w-auto w-full flex-1"
+                        />
+                        <select
+                            value={type}
+                            onChange={e => setType(e.target.value)}
+                            className="w-1/3 rounded-xl border p-2"
+                        >
+                            <option value="image">Image</option>
+                            <option value="video">Video</option>
+                        </select>
+                    </div>
 
                     <textarea type="text"
                         placeholder="Campaign Description"
                         value={description}
                         onChange={e => setDescription(e.target.value)}
-                        className="rounded border p-2 md:w-auto w-full flex-1"
+                        className="rounded-2xl border p-2 md:w-auto w-full flex-1"
                     />
 
-                    <div className='flex gap-2'>
-                        <select
-                            value={type}
-                            onChange={e => setType(e.target.value)}
-                            className="rounded border p-2 w-full"
-                        >
-                            <option value="image">Image</option>
-                            <option value="video">Video</option>
-                        </select>
-
-                        <input
-                            type="file"
-                            multiple
-                            accept={type === 'image' ? 'image/*' : 'video/*'}
-                            onChange={handleFiles}
-                            className="rounded border p-2 w-full"
-                        />
-                    </div>
-
-                    <div className='flex gap-2'>
-                        <input
-                            type="number"
-                            placeholder="Total Budget ($)"
-                            value={budget}
-                            onChange={(e) => setBudget(e.target.value)}
-                            className="rounded border p-2 w-full"
-                        />
-
-                        <input
-                            type="number"
-                            placeholder="Max Participants"
-                            value={maxParticipants}
-                            onChange={(e) => setMaxParticipants(e.target.value)}
-                            className="rounded border p-2 w-full"
-                        />
-                    </div>
                 </div>
 
                 {previewUrls.length > 0 && (
@@ -143,9 +118,9 @@ const CreatorPage = () => {
                         {previewUrls.map((url, index) => (
                             <div key={index} className="relative">
                                 {type === 'image' ? (
-                                    <img src={url} alt={`preview-${index}`} className="h-64 w-96 object-cover rounded border" />
+                                    <img src={url} alt={`preview-${index}`} className="h-54 w-74 object-fill rounded-xl border" />
                                 ) : (
-                                    <video src={url} controls className="h-64 w-96 object-cover rounded border" />
+                                    <video src={url} controls className="h-64 w-74 object-fill rounded-2xl border" />
                                 )}
 
                                 <button onClick={() => removeFile(index)}
@@ -157,14 +132,42 @@ const CreatorPage = () => {
                     </div>
                 )}
 
-                <button onClick={create} disabled={isCreating} className={`px-4 py-2 mt-8 rounded transition transform active:scale-95 ${isCreating ? 'bg-gray-400 text-gray-700 cursor-not-allowed' : 'bg-white text-black'}`}>
+
+                <div className='flex justify-center mt-4'>
+                    <label
+                        className="w-164 h-84 rounded-2xl flex items-center justify-center
+                            border-2 border-dashed border-green-500
+                            cursor-pointer hover:bg-green-50 transition mt-6"
+                    >
+                        <input
+                            type="file"
+                            multiple
+                            accept={type === 'image' ? 'image/*' : 'video/*'}
+                            onChange={handleFiles}
+                            className="hidden"
+                        />
+                        <div className='flex flex-col items-center'>
+                            <div className='w-15 h-15 flex items-center justify-center rounded-full bg-green-400' >
+                                <Upload className="text-black text-[40px] " />
+                            </div>
+                            <div className='flex flex-col items-center gap-1'>
+                                <p className='text-black text-2xl font-bold mt-3'>Upload your Thumbnail or Advertisment</p>
+                                <p className='text-gray-700 text-lg'>Browse your image or Videos...</p>
+                                <p className='text-gray-500'>Supports JPG, PNG • Recommended: 1280x720px</p>
+                                <div className=' text-center px-7 py-2 bg-green-600 text-white rounded-xl mt-4'>Choose File</div>
+                            </div>
+                        </div>
+                    </label>
+                </div>
+
+                <button onClick={create} disabled={isCreating} className={`mx-auto block px-10 py-3 mt-10 rounded transition transform active:scale-95 ${isCreating ? 'bg-green-600 text-gray-200 cursor-not-allowed' : 'bg-green-700 text-white'}`}>
                     {isCreating ? (
                         <span className="inline-flex items-center gap-2">
-                            <svg className="animate-spin h-5 w-5 text-black" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path></svg>
+                            <svg className="animate-spin h-5 w-5 text-gray-200" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path></svg>
                             Uploading...
                         </span>
                     ) : (
-                        'Create Campaign'
+                        'Upload'
                     )}
                 </button>
             </div>

@@ -1,5 +1,6 @@
 import Campaign from '../models/campaignModel.js';
 import { cloudinary } from '../config/cloudinary.js';
+import Chat from '../models/chatModel.js';
 import fs from 'fs';
 
 export const createCampaign = async (req, res) => {
@@ -155,3 +156,45 @@ export const getCampaignVotes = async (req, res) => {
     }
 }
 
+
+export const getCampaignChat = async (req, res) => {
+    try {
+        const campaignId = req.params.id;
+        console.log('getCampaignChat request', { campaignId, userId: req.userId });
+        if (!campaignId) return res.status(400).json({ message: 'campaign id required' });
+
+        const messages = await Chat.find({ campaignId }).sort({ createdAt: 1 }).lean();
+        res.json(messages);
+    }
+    catch (error) {
+        console.error('Error fetching chat:', error);
+        res.status(500).json({ message: "Error fetching chat", error: error.message });
+    }
+}
+
+export const createCampaignChat = async (req, res) => {
+    try {
+        const { username, content, replyTo } = req.body;
+        const userId = req.userId || req.body.userId;
+        const campaignId = req.params.id;
+        console.log('createCampaignChat request', { campaignId, userId, username, replyTo });
+
+        if (!userId) return res.status(401).json({ message: 'Unauthorized' });
+        if (!campaignId) return res.status(400).json({ message: 'campaign id required' });
+        if (!content || !content.trim()) return res.status(400).json({ message: 'content required' });
+
+        const newMessage = await Chat.create({
+            campaignId,
+            username: username || userId,
+            userId,
+            content,
+            replyTo: replyTo || null
+        });
+
+        res.json(newMessage);
+    }
+    catch (error) {
+        console.error('Error sending message:', error);
+        res.status(500).json({ message: "Error sending message", error: error.message });
+    }
+}

@@ -15,6 +15,10 @@ const CampaignDetails = () => {
     const [activeTab, setActiveTab] = useState("details");
     const [selectedIndex, setSelectedIndex] = useState(null);
     const [pollCounts, setPollCounts] = useState([]);
+    const [chatMessages, setChatMessages] = useState([]);
+    const [chatInput, setChatInput] = useState("");
+    const [replyTo, setReplyTo] = useState(null);
+
     const { getToken } = useAuth();
 
     const media = campaign.media || [];
@@ -121,6 +125,64 @@ const CampaignDetails = () => {
         }
     }
 
+
+    const fetchChat = async () => {
+        try {
+            const token = await getToken();
+            const res = await fetch(`${import.meta.env.VITE_BACKEND_URL || "http://localhost:5000"}/api/campaigns/${id}/chat`, {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            });
+            if (!res.ok) {
+                const text = await res.text();
+                console.error('Failed to fetch chat', res.status, text);
+                return;
+            }
+            const data = await res.json();
+            setChatMessages(data);
+        } catch (err) {
+            console.error(err);
+        }
+    };
+
+    const send = async () => {
+        if (!chatInput.trim()) return;
+        const token = await getToken();
+        // console.log('Sending chat', { tokenPresent: !!token, tokenLen: token?.length, body: { userId: user?.id, username: user?.fullName || user?.username, content: chatInput, replyTo } });
+        try {
+            const res = await fetch(`${import.meta.env.VITE_BACKEND_URL || "http://localhost:5000"}/api/campaigns/${id}/chat`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${token}`
+                },
+                body: JSON.stringify({
+                    userId: user.id,
+                    username: user.fullName || user.username || "User",
+                    content: chatInput,
+                    replyTo
+                })
+            })
+            if (!res.ok) {
+                const text = await res.text();
+                console.error('Send failed', res.status, text);
+                return;
+            }
+            const newMsg = await res.json();
+            setChatMessages(prev => [...prev, newMsg]);
+            setChatInput("");
+            setReplyTo(null);
+        }
+        catch (error) {
+            console.error("review error : ", error);
+        }
+    }
+
+    useEffect(() => {
+        fetchChat();
+    }, [id]);
+
     if (loading) {
         return <div className="col-span-full flex items-center justify-center p-8 min-h-screen">
             <div className="text-center">
@@ -151,22 +213,23 @@ const CampaignDetails = () => {
     };
 
 
+
     if (!loading) {
         return (
             <div className='w-full flex justify-center mt-4'>
-                <div className='w-[85%] max-w-[1200px] grid grid-cols-1 md:grid-cols-2 gap-10 text-white'>
-                    <div className='h-[calc(100vh-100px)]'>
-                        <h1 className='text-4xl font-bold mb-3'>{campaign.title}</h1>
+                <div className='w-full p-4 grid grid-cols-1 md:grid-cols-2 gap-6 text-white'>
+                    <div className='min-h-fit'>
+                        <h1 className='text-2xl text-black font-semibold mb-3'>{campaign.title}</h1>
 
 
                         {/* user */}
 
                         <div className='flex justify-between mb-4'>
                             <div className='flex justify-center gap-3'>
-                                <UserCircleIcon className='w-10 h-10 text-gray-300' />
+                                <UserCircleIcon className='w-10 h-10 text-black' />
                                 <div>
-                                    <p className='text-gray-200 font-medium'>{creatorName}</p>
-                                    <p className='text-gray-200 text-sm'>{new Date(campaign.createdAt).toDateString()}</p>
+                                    <p className='text-black font-medium'>{creatorName}</p>
+                                    <p className='text-gray-700 text-sm'>{new Date(campaign.createdAt).toDateString()}</p>
                                 </div>
                             </div>
 
@@ -219,45 +282,43 @@ const CampaignDetails = () => {
                         )}
                     </div>
 
-                    <div className='h-[calc(100vh-100px)]'>
+
+
+                    <div className='min-h-fit'>
 
                         <div className='flex gap-3'>
                             <button onClick={() => setActiveTab("details")}
-                                className={`text-2xl font-semibold mt-2 ${activeTab === "details" ? "text-white border-b-2 border-blue-500" : "text-gray-400 hover:text-gray-200"}`}>Description</button>
+                                className={`text-2xl font-semibold mt-2 ${activeTab === "details" ? "text-black border-b-2 border-gray-900" : "text-gray-600"}`}>Description</button>
                             <button onClick={() => setActiveTab("reviews")}
-                                className={`text-2xl font-semibold mt-2 ${activeTab === "reviews" ? "text-white border-b-2 border-blue-500" : "text-gray-400 hover:text-gray-200"}`}>Reviews</button>
+                                className={`text-2xl font-semibold mt-2 ${activeTab === "reviews" ? "text-black border-b-2 border-gray-900" : "text-gray-600"}`}>Reviews</button>
                         </div>
-                        <hr className='border-t border-gray-500 mt-2 mb-6' />
+                        <hr className='border-t border-gray-900 mt-3 mb-6' />
 
                         {activeTab === "details" && (
                             <>
-                                <p className='text-gray-300 mt-2'>{campaign.description}</p>
-                                <div className='mt-6'>
-                                    <p><strong>Reward:</strong> {campaign.perUserBudget}</p>
-                                    <p><strong>Max participants:</strong> {campaign.maxParticipants}</p>
-                                    <p><strong>Status:</strong> {campaign.status}</p>
+                                <p className='text-black font-semibold mt-1 text-md'>{campaign.description}</p>
+                                <div className='mt-2'>
+                                    <p className="text-gray-700 font-semibold"><strong className='text-green-700 font-semibold text-md'>Status:</strong> {campaign.status}</p>
                                 </div>
 
-
-                                <hr className='border-t border-gray-500 mt-6' />
-                                <h2 className="text-2xl fonnt-semibold mt-4">
+                                <h2 className="text-2xl fonnt-semibold text-black font-semibold mt-2">
                                     {mediaType === "video" ? "Select Best Ad" : "Select Best Thumbnail"}
                                 </h2>
 
-                                <div className="flex flex-col mt-4 gap-3">
+                                <div className="flex flex-col gap-3 mt-3">
                                     {media.map((m, i) => (
                                         <div key={i}
                                             onClick={() => handleVote(i)}
                                             role="button"
                                             tabIndex={0}
                                             onKeyDown={(e) => e.key === "Enter" && handleVote(i)}
-                                            className="flex items-center justify-between border border-gray-600 rounded-lg p-3 cursor-pointer hover:border-blue-500 transition"
+                                            className="flex items-center justify-between border border-gray-900 rounded-lg p-3 cursor-pointer hover:border-blue-500 transition"
                                         >
-                                            <div className="text-lg font-semibold text-gray-200">
+                                            <div className="text-lg font-semibold text-black">
                                                 {mediaType === 'video' ? `Ad ${i + 1}` : `Thumbnail ${i + 1}`}
                                             </div>
-                                            <div >
-                                                Votes: {formatCount(pollCounts[i] || 0)}
+                                            <div className='text-gray-700'>
+                                                <span className="text-black font-semibold">Votes:</span>{formatCount(pollCounts[i] || 0)}
                                             </div>
                                         </div>
                                     ))}
@@ -266,8 +327,100 @@ const CampaignDetails = () => {
                         )}
 
                         {activeTab === "reviews" && (
-                            <>None</>
+                            <div className="flex flex-col h-[70vh] rounded-lg">
+
+                                {/* Messages */}
+                                <div className="flex-1 overflow-y-auto p-4 space-y-5 scroll-smooth scrollbar-hide">
+
+
+                                    {chatMessages.length === 0 ? (
+                                        <div className="text-gray-800 text-center mt-10">
+                                            No reviews yet...
+                                        </div>
+                                    ) : (
+                                        chatMessages
+                                            .filter(msg => !msg.replyTo) // top-level messages
+                                            .map(msg => {
+
+                                                const replies = chatMessages.filter(r => r.replyTo === msg._id);
+                                                const isMe = msg.userId === user?.id;
+
+                                                return (
+                                                    <div key={msg._id} className="flex flex-col gap-2">
+
+                                                        {/* Main message */}
+                                                        <div className={`rounded-lg px-4 py-2 max-w-[80%] ${isMe ? "ml-auto bg-green-500" : "bg-[#E9DFC9]"}`}>
+                                                            <p className={` text-md font-bold mb-1 ${isMe ? "text-white" : "text-black"}`}>{msg.username}</p>
+                                                            <p className={`${isMe ? "text-white" : "text-gray-800"}`}>{msg.content}</p>
+
+                                                            <button
+                                                                className="text-xs mt-2 text-red-600 font-semibold hover:underline"
+                                                                onClick={() => setReplyTo(msg._id)}
+                                                            >
+                                                                Reply
+                                                            </button>
+                                                        </div>
+
+                                                        {/* Replies (collapsible) */}
+                                                        {replies.length > 0 && (
+                                                            <details className="ml-4 text-sm">
+                                                                <summary className="cursor-pointer text-gray-500 hover:text-black">
+                                                                    {replies.length} replies
+                                                                </summary>
+
+                                                                <div className="mt-2 flex flex-col gap-2">
+                                                                    {replies.map(rep => {
+                                                                        const isReplyMe = rep.userId === user?.id;
+                                                                        return (
+                                                                            <div
+                                                                                key={rep._id}
+                                                                                className={`rounded-md px-3 py-2 max-w-[75%] text-xs ${isReplyMe ? "bg-green-400 ml-auto" : "bg-[#F6F1E8]"}`}
+                                                                            >
+                                                                                <p className={` text-md font-bold mb-1 ${isMe ? "text-black" : "text-white"}`}>
+                                                                                    {rep.username || rep.userId.slice(0, 6)}
+                                                                                </p>
+                                                                                <p className={`${isMe ? "text-gray-800" : "text-white"}`}>{rep.content}</p>
+                                                                            </div>
+                                                                        );
+                                                                    })}
+                                                                </div>
+                                                            </details>
+                                                        )}
+                                                    </div>
+                                                );
+                                            })
+                                    )}
+
+
+                                </div>
+
+                                {/* Reply Indicator */}
+                                {replyTo && (
+                                    <div className="bg-gray-900 text-sm px-4 py-1 text-blue-400">
+                                        Replying... <button onClick={() => setReplyTo(null)} className="text-red-400 ml-2">Cancel</button>
+                                    </div>
+                                )}
+
+                                {/* Input */}
+                                <div className=" p-3 flex gap-3 ">
+                                    <input
+                                        value={chatInput}
+                                        onChange={e => setChatInput(e.target.value)}
+                                        placeholder="Write a message..."
+                                        className="flex-1 text-black border px-3 py-2 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500"
+                                    />
+
+                                    <button
+                                        onClick={send}
+                                        className="bg-blue-600 hover:bg-blue-700 rounded-lg text-white px-4"
+                                    >
+                                        Send
+                                    </button>
+                                </div>
+
+                            </div>
                         )}
+
 
                     </div>
                 </div>

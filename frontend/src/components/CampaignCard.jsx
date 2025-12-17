@@ -20,17 +20,17 @@ const CampaignCard = ({ campaign }) => {
   };
 
   return (
-    <div className="bg-[#14131e] border border-[#2a2a3a] rounded-xl p-4 mt-1 md:mt-2 hover:scale-[1.02] transition-transform duration-200">
+    <div className="rounded-xl mt-1 md:mt-2 hover:scale-[1.02] transition-transform duration-200">
       {mediaSrc ? (
         <div className="w-full mb-3">
           {!imgLoaded && mediaType !== 'video' && (
-            <div className="w-full h-44 bg-gray-700 rounded-md animate-pulse" aria-hidden="true" />
+            <div className="object-cover bg-gray-700 rounded-md animate-pulse" aria-hidden="true" />
           )}
           {mediaType === 'video' ? (
             <video
               src={mediaSrc}
               controls
-              className="w-full h-44 object-cover rounded-md"
+              className="w-full h-[320px] object-cover rounded-md"
               poster={getThumbnail(mediaSrc)}
               preload="metadata"
               onLoadedMetadata={() => setImgLoaded(true)}
@@ -40,7 +40,7 @@ const CampaignCard = ({ campaign }) => {
             <img
               src={mediaSrc}
               alt={campaign.title}
-              className={`w-full h-44 object-cover rounded-md ${imgLoaded ? 'block' : 'hidden'}`}
+              className="w-full h-[320px] object-cover rounded-md"
               onLoad={() => setImgLoaded(true)}
               onError={() => setImgLoaded(true)}
             />
@@ -52,11 +52,9 @@ const CampaignCard = ({ campaign }) => {
 
       {shouldShowDetails && (
         <>
-          <h3 className='font-semibold text-lg text-gray-200'>{campaign.title}</h3>
-          <p className="text-sm text-gray-400 my-2">Reward : ${campaign.perUserBudget} • Limit: {campaign.maxParticipants}</p>
           <div className="mt-3 flex justify-between items-center">
-            <Link to={`/campaign/${campaign._id}`} className="text-sm bg-purple-600 px-3 py-1 rounded">open</Link>
-            <span className="text-xs text-gray-400">Status: {campaign.status}</span>
+            <Link to={`/campaign/${campaign._id}`} className="text-sm bg-green-800 px-3 py-1 rounded text-white">open</Link>
+            <span className="text-xs text-gray-900"><span className='text-black font-semibold'>Status:</span> {campaign.status}</span>
           </div>
         </>
       )}

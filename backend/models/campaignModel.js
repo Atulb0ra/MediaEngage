@@ -1,20 +1,20 @@
 import mongoose from 'mongoose';
 
 const mediaSchema = new mongoose.Schema({
-    url : String,
-    resource_type : String,
+    url: String,
+    resource_type: String,
 });
 
 const campaignSchema = new mongoose.Schema({
-    creatorId :{
+    creatorId: {
         type: String,
         required: true
     },
-    title : {
+    title: {
         type: String,
         required: true
     },
-    description : {
+    description: {
         type: String,
         required: true
     },
@@ -24,50 +24,29 @@ const campaignSchema = new mongoose.Schema({
         required: true,
         default: 'image'
     },
-    media : [mediaSchema],
-    totalBudget : {
-        type: Number,
-        required: true,
-    },
-    maxParticipants : {
-        type: Number,
-        required: true,     
-    },
-    perUserBudget : {
-        type: Number,
-        required: true, 
-    },
-    interactionCount :{
+    media: [mediaSchema],
+    interactionCount: {
         type: Number,
         default: 0
     },
-    uniqueUsers : {
+    uniqueUsers: {
         type: Number,
         default: 0
     },
-    ctr : {
+    ctr: {
         type: Number,
         default: 0
     },
-    status:{
-        type: String,
-        enum: ['active', 'completed', 'draft', 'cancelled'],
-        default: 'active'
+    pollCounts: {
+        type: [Number],
+        default: []
     },
-    createdAt: {
-        type: Date,
-        default: Date.now()
-    },
-    pollCounts : {
-        type : [Number],
-        default : []
-    },
-    votes :[
+    votes: [
         {
-            userId : String,
-            index : Number
+            userId: String,
+            index: Number
         }
-    ]
+    ],
 });
 
 const Campaign = mongoose.model('Campaign', campaignSchema);
